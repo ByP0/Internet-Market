@@ -1,7 +1,7 @@
 import bcrypt
 from jose import jwt
 from datetime import datetime, timedelta, timezone
-from config import secret_key, algo
+from backend.app.config import secret_key, algo
 
 
 def create_access_token(data: dict) -> str:
@@ -10,7 +10,6 @@ def create_access_token(data: dict) -> str:
     to_encode.update({"exp": expire})
     encode_jwt = jwt.encode(to_encode, key=secret_key, algorithm=algo)
     return encode_jwt
-
 
 def hash_password(password: str) -> bytes:
     salt = bcrypt.gensalt()

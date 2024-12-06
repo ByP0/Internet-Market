@@ -3,10 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import Annotated
 
-from schemas.users_schema import UserInfoSchema
-from schemas.auth_schemas import LogginingSchema
-from models.users_models import Users
-from database import get_session
+from backend.app.schemas.users_schema import UserInfoSchema
+from backend.app.schemas.auth_schemas import LogginingSchema
+from backend.app.models.users_models import Users
+from backend.app.database import get_session
+from backend.app.services.auth_service import validate_password
 
 
 router = APIRouter(prefix='/user', tags=['Users'])
@@ -20,6 +21,8 @@ async def get_my_info(
         response_db = select(Users).where(Users.username == credentials.username)
         result = await session.execute(response_db)
         user_data = result.scalars().first()
+        if not validate_password(credentials.password, user_data.password.encode('utf-8')):
+            raise HTTPException(status_code=404, detail="Неверный пароль")
         return UserInfoSchema(
             username=user_data.email,
             email=user_data.email,

@@ -2,26 +2,26 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from schemas.auth_schemas import RegisterSchema, LogginingSchema, TokenInfo
-from models.users_models import Users
-from database import get_session
-from services.auth_service import hash_password, validate_password, create_access_token
+from backend.app.schemas.auth_schemas import RegisterSchema, LogginingSchema, TokenInfo
+from backend.app.models.users_models import Users
+from backend.app.database import get_session
+from backend.app.services.auth_service import hash_password, validate_password, create_access_token
 
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 
 
-@router.post('/sing_up/', response_model=TokenInfo)
+@router.post('/sing_up/')
 async def register(
     credentials: RegisterSchema,
-    session: AsyncSession = Depends(get_session),) -> bool:
+    session: AsyncSession = Depends(get_session),):
     try:
         response_db = select(Users).where(Users.username == credentials.username)
         result = await session.execute(response_db)
         user = result.scalars().first()
-        if user:
-            return HTTPException(status_code=400, detail="Такой пользователь уже зарегестрирован")       
         try:
+            if user:
+                return HTTPException(status_code=400, detail="Такой пользователь уже зарегестрирован")
             if user.email == credentials.email:
                 return HTTPException(status_code=400, detail="Почта уже используется")
         except AttributeError:

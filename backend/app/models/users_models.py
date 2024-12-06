@@ -1,8 +1,8 @@
-from sqlalchemy import BigInteger, Text, ForeignKey, func, Float, text, Null
+from sqlalchemy import BigInteger, Text, text, Null
 from sqlalchemy.orm import Mapped, mapped_column
 import datetime
 from typing import Optional
-from main_models import Base
+from backend.app.main_models import Base
 
 
 class Users(Base):
